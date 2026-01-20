@@ -305,6 +305,27 @@ class CableTesterFletApp:
                 self.page.update()
                 break
 
+    def check_port_available(self, port, baud):
+        """Vérifie si le port UART est disponible et accessible"""
+        try:
+            # Essai d'ouverture rapide du port
+            with serial.Serial(port=port, baudrate=baud, timeout=0.1) as ser:
+                # Flush des buffers pour nettoyer
+                ser.reset_input_buffer()
+                ser.reset_output_buffer()
+                time.sleep(0.05)  # Petit délai pour laisser le buffer se vider
+            return True, None
+        except serial.SerialException as e:
+            error_msg = str(e)
+            if "Permission denied" in error_msg or "Access is denied" in error_msg:
+                return False, "Permission refusée. Vérifiez les droits d'accès au port."
+            elif "could not open port" in error_msg.lower() or "cannot open" in error_msg.lower():
+                return False, f"Impossible d'ouvrir le port {port}. Il est peut-être déjà utilisé par une autre application."
+            else:
+                return False, f"Erreur d'accès au port: {error_msg}"
+        except Exception as e:
+            return False, f"Erreur inattendue: {str(e)}"
+
     def identify_tester(self):
         """Identifie le testeur"""
         port = (self.port_dropdown.value or "").strip()
@@ -318,6 +339,28 @@ class CableTesterFletApp:
             self._show_warning("Baudrate invalide", "Entre un baudrate valide (ex: 38400).")
             return
 
+        # Vérification de la disponibilité du port
+        self.log_line(f"Vérification de la disponibilité du port {port}...")
+        self.set_status("Vérification du port...")
+
+        available, error_msg = self.check_port_available(port, baud)
+
+        if not available:
+            self.log_line(f"✗ Port non disponible : {error_msg}")
+            self.set_status("Erreur d'accès au port.")
+            self._show_error(
+                "Port UART non disponible",
+                f"Impossible d'accéder au port {port}.\n\n"
+                f"Erreur : {error_msg}\n\n"
+                f"Suggestions :\n"
+                f"- Vérifiez que le périphérique est bien connecté\n"
+                f"- Fermez toute autre application utilisant ce port\n"
+                f"- Sous Linux : vérifiez les permissions (sudo usermod -a -G dialout $USER)\n"
+                f"- Essayez de débrancher et rebrancher le câble USB"
+            )
+            return
+
+        self.log_line(f"✓ Port {port} disponible")
         self.log_line(f"Tentative d'identification du testeur sur {port}...")
         self.identify_btn.disabled = True
         self.page.update()
