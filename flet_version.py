@@ -109,7 +109,7 @@ class CableTesterFletApp:
             disabled=True
         )
 
-        self.status_text = ft.Text("Prêt.", size=11, color=ft.colors.BLUE)
+        self.status_text = ft.Text("Prêt.", size=11, color=ft.Colors.BLUE)
 
         self.log_view = ft.ListView(
             expand=True,
@@ -142,7 +142,7 @@ class CableTesterFletApp:
                 ], spacing=10),
             ], spacing=10),
             padding=15,
-            border=ft.border.all(1, ft.colors.OUTLINE),
+            border=ft.border.all(1, ft.Colors.OUTLINE),
             border_radius=10,
         )
 
@@ -169,7 +169,7 @@ class CableTesterFletApp:
                 ], spacing=10),
             ], spacing=10),
             padding=15,
-            border=ft.border.all(1, ft.colors.OUTLINE),
+            border=ft.border.all(1, ft.Colors.OUTLINE),
             border_radius=10,
         )
 
@@ -184,7 +184,7 @@ class CableTesterFletApp:
                 ], spacing=15),
             ], spacing=10),
             padding=15,
-            border=ft.border.all(1, ft.colors.OUTLINE),
+            border=ft.border.all(1, ft.Colors.OUTLINE),
             border_radius=10,
         )
 
@@ -201,7 +201,7 @@ class CableTesterFletApp:
                 self.log_view,
             ], spacing=10),
             padding=15,
-            border=ft.border.all(1, ft.colors.OUTLINE),
+            border=ft.border.all(1, ft.Colors.OUTLINE),
             border_radius=10,
             expand=True,
         )
@@ -612,11 +612,11 @@ class CableTesterFletApp:
 
         if is_conform:
             self.log_line("✓ Test CONFORME : les données correspondent à la référence.")
-            self._show_result_popup("CONFORME", ft.colors.GREEN, ft.colors.WHITE)
+            self._show_result_popup("CONFORME", ft.Colors.GREEN, ft.Colors.WHITE)
         else:
             self.log_line("✗ Test NON-CONFORME : les données diffèrent de la référence.")
             self.log_line(f"Données reçues : {json.dumps(data, ensure_ascii=False)[:200]}...")
-            self._show_result_popup("NON-CONFORME", ft.colors.RED, ft.colors.WHITE)
+            self._show_result_popup("NON-CONFORME", ft.Colors.RED, ft.Colors.WHITE)
 
     def _finish_test_err(self, msg):
         """Gère les erreurs lors du test"""
