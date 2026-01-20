@@ -21,9 +21,6 @@ class CableTesterFletApp:
         self.page.theme_mode = ft.ThemeMode.SYSTEM
 
         # Variables d'état
-        self.port_var = ""
-        self.baud_var = "38400"
-        self.timeout_var = "2.0"
         self.cmd_var = "TEST\\n"
 
         # Références JSON chargées
@@ -65,7 +62,6 @@ class CableTesterFletApp:
         self.port_dropdown = ft.Dropdown(
             width=250,
             options=[],
-            on_change=self.on_port_changed,
         )
 
         self.identify_btn = ft.ElevatedButton(
@@ -82,15 +78,13 @@ class CableTesterFletApp:
         )
 
         self.baud_field = ft.TextField(
-            value=self.baud_var,
+            value="38400",
             width=120,
-            on_change=self.on_baud_changed,
         )
 
         self.timeout_field = ft.TextField(
-            value=self.timeout_var,
+            value="2.0",
             width=80,
-            on_change=self.on_timeout_changed,
         )
 
         self.active_ref_field = ft.TextField(
@@ -223,18 +217,6 @@ class CableTesterFletApp:
             ], spacing=10, expand=True)
         )
 
-    def on_port_changed(self, e):
-        """Callback quand le port change"""
-        self.port_var = e.control.value
-
-    def on_baud_changed(self, e):
-        """Callback quand le baudrate change"""
-        self.baud_var = e.control.value
-
-    def on_timeout_changed(self, e):
-        """Callback quand le timeout change"""
-        self.timeout_var = e.control.value
-
     def log_line(self, s: str):
         """Ajoute une ligne au journal"""
         timestamp = datetime.now().strftime("%H:%M:%S")
@@ -264,12 +246,10 @@ class CableTesterFletApp:
 
         self.port_dropdown.options = [ft.dropdown.Option(item) for item in items]
         if items:
-            if self.port_var not in items:
-                self.port_var = items[0]
+            if not self.port_dropdown.value or self.port_dropdown.value not in items:
                 self.port_dropdown.value = items[0]
             self.set_status(f"{len(items)} port(s) détecté(s). Identification requise.")
         else:
-            self.port_var = ""
             self.port_dropdown.value = None
             self.set_status("Aucun port détecté.")
 
@@ -296,7 +276,6 @@ class CableTesterFletApp:
                     dialog.open = False
                     self.page.update()
                     if e.control.text == "Oui":
-                        self.port_var = device_name
                         self.port_dropdown.value = device_name
                         self.page.update()
                         self.log_line(f"Connexion automatique au testeur sur {device_name}...")
@@ -328,13 +307,13 @@ class CableTesterFletApp:
 
     def identify_tester(self):
         """Identifie le testeur"""
-        port = self.port_var.strip()
+        port = (self.port_dropdown.value or "").strip()
         if not port:
             self._show_warning("Port manquant", "Sélectionne un port UART avant d'identifier le testeur.")
             return
 
         try:
-            baud = int(self.baud_var.strip())
+            baud = int((self.baud_field.value or "").strip())
         except ValueError:
             self._show_warning("Baudrate invalide", "Entre un baudrate valide (ex: 38400).")
             return
@@ -574,19 +553,19 @@ class CableTesterFletApp:
             self._show_warning("Référence manquante", "Charge ou sélectionne une référence active avant de tester.")
             return
 
-        port = self.port_var.strip()
+        port = (self.port_dropdown.value or "").strip()
         if not port:
             self._show_warning("Port manquant", "Sélectionne un port UART.")
             return
 
         try:
-            baud = int(self.baud_var.strip())
+            baud = int((self.baud_field.value or "").strip())
         except ValueError:
             self._show_warning("Baudrate invalide", "Entre un baudrate valide (ex: 38400).")
             return
 
         try:
-            timeout = float(self.timeout_var.strip())
+            timeout = float((self.timeout_field.value or "").strip())
         except ValueError:
             self._show_warning("Timeout invalide", "Entre un timeout valide (ex: 2.0).")
             return
@@ -696,19 +675,19 @@ class CableTesterFletApp:
             self._show_warning("Testeur non identifié", "Identifie d'abord le testeur avec le bouton '🔌 Connecter'.")
             return
 
-        port = self.port_var.strip()
+        port = (self.port_dropdown.value or "").strip()
         if not port:
             self._show_warning("Port manquant", "Sélectionne un port UART.")
             return
 
         try:
-            baud = int(self.baud_var.strip())
+            baud = int((self.baud_field.value or "").strip())
         except ValueError:
             self._show_warning("Baudrate invalide", "Entre un baudrate valide (ex: 38400).")
             return
 
         try:
-            timeout = float(self.timeout_var.strip())
+            timeout = float((self.timeout_field.value or "").strip())
         except ValueError:
             self._show_warning("Timeout invalide", "Entre un timeout valide (ex: 2.0).")
             return
