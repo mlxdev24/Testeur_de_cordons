@@ -61,6 +61,69 @@ class CableTesterFletApp:
     def _build_ui(self):
         """Construction de l'interface utilisateur"""
 
+        # Création des widgets réutilisables
+        self.port_dropdown = ft.Dropdown(
+            width=250,
+            options=[],
+            on_change=self.on_port_changed,
+        )
+
+        self.identify_btn = ft.ElevatedButton(
+            "🔌 Connecter",
+            on_click=lambda _: self.identify_tester(),
+            width=120
+        )
+
+        self.disconnect_btn = ft.ElevatedButton(
+            "❌ Déconnecter",
+            on_click=lambda _: self.disconnect_tester(),
+            width=120,
+            disabled=True
+        )
+
+        self.baud_field = ft.TextField(
+            value=self.baud_var,
+            width=120,
+            on_change=self.on_baud_changed,
+        )
+
+        self.timeout_field = ft.TextField(
+            value=self.timeout_var,
+            width=80,
+            on_change=self.on_timeout_changed,
+        )
+
+        self.active_ref_field = ft.TextField(
+            value="Aucune référence chargée",
+            read_only=True,
+            text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+        )
+
+        self.save_btn = ft.ElevatedButton(
+            "💾 Enregistrer un nouveau câble",
+            on_click=lambda _: self.on_save_clicked(),
+            width=280,
+            height=40,
+            disabled=True
+        )
+
+        self.test_btn = ft.ElevatedButton(
+            "✓ Tester la conformité",
+            on_click=lambda _: self.on_test_clicked(),
+            width=280,
+            height=40,
+            disabled=True
+        )
+
+        self.status_text = ft.Text("Prêt.", size=11, color=ft.colors.BLUE)
+
+        self.log_view = ft.ListView(
+            expand=True,
+            spacing=2,
+            padding=10,
+            auto_scroll=True,
+        )
+
         # ===== SECTION CONFIGURATION UART =====
         uart_section = ft.Container(
             content=ft.Column([
@@ -69,39 +132,18 @@ class CableTesterFletApp:
                 # Ligne 1: Port
                 ft.Row([
                     ft.Text("Port :", size=12, weight=ft.FontWeight.BOLD, width=80),
-                    self.port_dropdown := ft.Dropdown(
-                        width=250,
-                        options=[],
-                        on_change=self.on_port_changed,
-                    ),
+                    self.port_dropdown,
                     ft.ElevatedButton("🔄 Re-scanner", on_click=lambda _: self.refresh_ports(), width=120),
-                    self.identify_btn := ft.ElevatedButton(
-                        "🔌 Connecter",
-                        on_click=lambda _: self.identify_tester(),
-                        width=120
-                    ),
-                    self.disconnect_btn := ft.ElevatedButton(
-                        "❌ Déconnecter",
-                        on_click=lambda _: self.disconnect_tester(),
-                        width=120,
-                        disabled=True
-                    ),
+                    self.identify_btn,
+                    self.disconnect_btn,
                 ], spacing=10),
 
                 # Ligne 2: Paramètres
                 ft.Row([
                     ft.Text("Baudrate :", size=12, weight=ft.FontWeight.BOLD, width=80),
-                    self.baud_field := ft.TextField(
-                        value=self.baud_var,
-                        width=120,
-                        on_change=self.on_baud_changed,
-                    ),
+                    self.baud_field,
                     ft.Text("Timeout :", size=12, weight=ft.FontWeight.BOLD),
-                    self.timeout_field := ft.TextField(
-                        value=self.timeout_var,
-                        width=80,
-                        on_change=self.on_timeout_changed,
-                    ),
+                    self.timeout_field,
                     ft.Text("secondes", size=10),
                 ], spacing=10),
             ], spacing=10),
@@ -116,11 +158,7 @@ class CableTesterFletApp:
                 ft.Text("Référence de câblage", size=16, weight=ft.FontWeight.BOLD),
 
                 # Champ référence
-                self.active_ref_field := ft.TextField(
-                    value="Aucune référence chargée",
-                    read_only=True,
-                    text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
-                ),
+                self.active_ref_field,
 
                 # Boutons gestion référence
                 ft.Row([
@@ -147,20 +185,8 @@ class CableTesterFletApp:
                 ft.Text("Actions", size=16, weight=ft.FontWeight.BOLD),
 
                 ft.Row([
-                    self.save_btn := ft.ElevatedButton(
-                        "💾 Enregistrer un nouveau câble",
-                        on_click=lambda _: self.on_save_clicked(),
-                        width=280,
-                        height=40,
-                        disabled=True
-                    ),
-                    self.test_btn := ft.ElevatedButton(
-                        "✓ Tester la conformité",
-                        on_click=lambda _: self.on_test_clicked(),
-                        width=280,
-                        height=40,
-                        disabled=True
-                    ),
+                    self.save_btn,
+                    self.test_btn,
                 ], spacing=15),
             ], spacing=10),
             padding=15,
@@ -171,20 +197,14 @@ class CableTesterFletApp:
         # ===== STATUS BAR =====
         status_bar = ft.Row([
             ft.Text("État :", size=11, weight=ft.FontWeight.BOLD),
-            self.status_text := ft.Text("Prêt.", size=11, color=ft.colors.BLUE),
+            self.status_text,
         ], spacing=5)
 
         # ===== LOG =====
         log_section = ft.Container(
             content=ft.Column([
                 ft.Text("📋 Journal d'activité", size=16, weight=ft.FontWeight.BOLD),
-
-                self.log_view := ft.ListView(
-                    expand=True,
-                    spacing=2,
-                    padding=10,
-                    auto_scroll=True,
-                ),
+                self.log_view,
             ], spacing=10),
             padding=15,
             border=ft.border.all(1, ft.colors.OUTLINE),
